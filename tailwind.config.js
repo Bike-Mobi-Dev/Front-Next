@@ -13,7 +13,7 @@ module.exports = {
       'azul': '#3AA0FF',
       'white': '#fff',
       'tomEscuro': '#170F49',
-      'cinza': '#5E597A',
+      'cinza': '#979797',
       'cinzaClaro': '#EFF0F6'
     },
     fontFamily: {
@@ -22,6 +22,23 @@ module.exports = {
     },
     extend: {},
   },
-  plugins: [],
+  daisyui: {
+    themes: [
+      {
+        mytheme: {
+          "primary": "#3AA0FF",
+          "secondary": "#170F49",
+          "accent": "#979797",
+          "neutral": "#1E1E1E",
+          "base-100": "#fff",
+          "info": "#3ABFF8",
+          "success": "#36D399",
+          "warning": "#FBBD23",
+          "error": "#F87272",
+        },
+      },
+    ],
+  },
+  plugins: [require("daisyui")],
 }
 
