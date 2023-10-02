@@ -7,12 +7,33 @@ import { TrashIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 import NumberInput from '../inputs/NumberInput';
 import ButtonModalComponent from '../utils/ButtonModalComponent';
 import TitleModalComponent from '../utils/TitleModalComponent';
+import React, { useEffect, useState }  from 'react';
 
 const ModalClassificados = (props) => {
 
     const data = props.data
+    console.log('classificados data: ',data)
 
     const router = useRouter()
+
+    const [price, setPrice] = useState()
+    const [title, setTitle] = useState()
+    const [descricao, setDescricao] = useState()
+    const [contato, setContato] = useState()
+    const [vendedor, setVendedor] = useState()
+
+    const handlePrice = (e) => setPrice(e.target.value)
+    const handleTitle = (e) => setTitle(e.target.value)
+    const handleDescricao = (e) => setDescricao(e.target.value)
+    const handleContato = (e) => setContato(e.target.value)
+    const handleVendedor = (e) => setVendedor(e.target.value)
+
+    const [photo, setPhoto] = useState()
+
+    const handlePhoto = (file) => {
+        setPhoto(file)
+        console.log("photo: ",photo)
+    }
 
     function buttonOpenModal(){
 
@@ -27,62 +48,102 @@ const ModalClassificados = (props) => {
         }
     }
 
-    function preco(){
-        const precoString = data?.price.toString().replace(/[.,]/g, "")
+    // function preco(e){
+    //     const precoString = Price?.toString().replace(/[.,]/g, "")
 
-        const precoNumero = ((parseInt(precoString)/100).toFixed(2))
-        const valorFormatado = precoNumero.toLocaleString('pt-BR', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        });
+    //     const precoNumero = ((parseInt(precoString)/100))
+    //     const valorFormatado = precoNumero.toLocaleString('pt-BR', {
+    //         minimumFractionDigits: 2,
+    //         maximumFractionDigits: 2,
+    //     });
+    //     if(e == 'defaultValue'){
+    //         return precoNumero.toFixed(2)
+    //     }
+    //     else{
+    //         return setPrice(valorFormatado)
+    //     }
+    // }
+    console.log('userId: ', props?.userId)
 
-        return valorFormatado
+    let newData = {
+        name: title,
+        description: descricao,
+        price: price,
+        contact: contato,
+        seller: vendedor,
+        photo: photo,
+        user_id: props.userId,
     }
 
     return (
         <div className="modal-container h-[41px] items-center flex">
 
-            <label htmlFor={`my-modal${props.id}`} className=' text-white p-0 h-full cursor-pointer'>
+            <label htmlFor={`my-modal${props?.id}`} className=' text-white p-0 h-full cursor-pointer'>
                 {buttonOpenModal()}
             </label>
             <input
-                type={`${props.path == "/classificados" ? null : "checkbox"}`}
-                id={`my-modal${props.id}`}
+                type={`${props?.path == "/classificados" ? null : "checkbox"}`}
+                id={`my-modal${props?.id}`}
                 className="modal-toggle"
                 onClick={props.path == "/classificados" ? () => router.push('/autenticacao/login') : null}
             />
 
-            <label htmlFor={`my-modal${props.id}`} className="modal cursor-pointer">
+            <label htmlFor={`my-modal${props?.id}`} className="modal cursor-pointer">
                 <label className="rounded-lg modal-box relative" htmlFor="">
-                    <label htmlFor={`my-modal${props.id}`} className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+                    <label htmlFor={`my-modal${props?.id}`} className="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
                     <div className="flex flex-col justify-center items-center overflow-auto">
 
-                        <TitleModalComponent title={props.action}/>
+                        <TitleModalComponent action={props?.action} title={'Anúncio'}/>
 
-                        {props.action != 'delete' ?
+                        {props?.action != 'delete' ?
                             <div className='w-full'>
 
                                 <TextInput name="Titulo"
-                                    defaultValue={data?.title}
+                                    defaultValue={data?.name}
                                     width="w-full"
+                                    onChange={handleTitle}
                                     className="disabled disabled:opacity-75"
                                     required
                                 />
+
                                 <TextInput name="Descrição"
                                     defaultValue={data?.description}
                                     width="w-full"
+                                    onChange={handleDescricao}
                                     required
                                 />
-                                <NumberInput name="Valor"
-                                    defaultValue={preco()}
+
+                                <TextInput name="Valor"
+                                    defaultValue={data?.price}
                                     width="w-full"
+                                    onChange={handlePrice}
+                                    price
                                     required
                                 />
+
+                                <TextInput name="Contato"
+                                    defaultValue={data?.contact}
+                                    width="w-full"
+                                    onChange={handleContato}
+                                    className="disabled disabled:opacity-75"
+                                    required
+                                />
+
+                                <TextInput name="Vendedor"
+                                    defaultValue={data?.seller}
+                                    width="w-full"
+                                    onChange={handleVendedor}
+                                    className="disabled disabled:opacity-75"
+                                    required
+                                />
+
                                 <FileInput name="Imagem"
                                     defaultValue={data?.photo}
                                     width="w-full"
                                     text="Upload"
                                     description="SVG, PNG ou JPG"
+                                    onChange={setPhoto}
+                                    typeImgURL='classificadoFoto'
                                     required
                                 />
                             </div>
@@ -95,7 +156,12 @@ const ModalClassificados = (props) => {
                         }
 
                         <div className='relative w-full mt-16'>
-                            <ButtonModalComponent title={props.action}/>
+                            <ButtonModalComponent
+                                title={props?.action}
+                                data={data}
+                                newData={newData}
+                                baseUrl='classificado'
+                            />
                         </div>
 
                     </div>

@@ -1,6 +1,8 @@
+'use client'
+
 import React from 'react'
 
-const LojaLayout = (props) => {
+const PerfilLayout = (props) => {
     return (
         <div>
             <div className='font-dmsans text-xl text-tomEscuro font-medium absolute left-5 md:left-[280px] top-5'>Lojas</div>
@@ -9,4 +11,4 @@ const LojaLayout = (props) => {
     )
 }
 
-export default LojaLayout
+export default PerfilLayout
