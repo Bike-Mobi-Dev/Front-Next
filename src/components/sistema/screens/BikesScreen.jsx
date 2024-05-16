@@ -16,19 +16,21 @@ const PassarBike = () => {
 
   const [idBike, setIdBike] = useState()
   const [ciclistaUser, setCiclistaUser] = useState([undefined, undefined])
-  const [cpfReceiver, setCpfReceiver] = useState()
+  const [cpfReceiver, setCpfReceiver] = useState('')
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    setLoading(true)
-    instance.get(`/getCiclistaByCpf/${cpfReceiver}`).then((resp) => {
-      setCiclistaUser(resp.data)
-      setLoading(false)
-      console.log('rasp.data: ',resp.data, 'ciclistaUser:', ciclistaUser)
-    }).catch(() => {
-      setCiclistaUser([undefined, undefined])
-      setLoading(false)
-    })
+    if(cpfReceiver.length > 0){
+      setLoading(true)
+      instance.get(`/getCiclistaByCpf/${cpfReceiver}`).then((resp) => {
+        setCiclistaUser(resp.data)
+        setLoading(false)
+        console.log('rasp.data: ',resp.data, 'ciclistaUser:', ciclistaUser)
+      }).catch(() => {
+        setCiclistaUser([undefined, undefined])
+        setLoading(false)
+      })
+    }
   }, [cpfReceiver])
 
   let newData = {
@@ -48,9 +50,9 @@ const PassarBike = () => {
             <label className="label">
               <span className={`label-text font-medium`}>Bike</span>
             </label>
-            <select className="select select-bordered border-cinza w-full" onChange={(e) => setIdBike(e.target.value)}>
-              <option value='selecione' selected>Selecione</option>
-              {authData.bikes.map(item => (
+            <select className="select select-bordered border-cinza w-full" defaultValue={'selecione'} onChange={(e) => setIdBike(e.target.value)}>
+              <option value='selecione'>Selecione</option>
+              {authData.bikes?.map(item => (
                 <option key={item.id} value={item.id}>{item.nameBike}</option>
               ))}
             </select>
@@ -109,7 +111,6 @@ const BikesScreen = (props) => {
   const { authData } = useContext(AuthContext)
 
     const data = props.produtos
-    console.log(data)
 
       return (
         <div className={`my-10`}>
@@ -118,7 +119,7 @@ const BikesScreen = (props) => {
               <ModalBicicleta
                 action="create"
                 data={data}
-                cyclistId = {authData.type.id}
+                cyclistId = {authData.type?.id}
               />
 
               <PassarBike/>

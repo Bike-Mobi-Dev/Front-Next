@@ -2,23 +2,19 @@
 
 import React, { useState, useEffect, useContext } from 'react';
 import { ApiContext } from '@/contexts/Api';
-import { AuthContext } from '@/contexts/Auth';
 
-const PremiumDash = () => {
-
+const TableComponent = ({route, fields, cols, loading, setLoading}) => {
     const { instance } = useContext(ApiContext)
-    const {authData} = useContext(AuthContext)
 
-    const [users, setUsers] = useState()
+    const [data, setData] = useState()
     const [searchName, setSearchName] = useState()
     const [currentPage, setCurrentPage] = useState(1)
-    const [loading, setLoading] = useState(0)
 
     const query = async (currentPage, searchName) => {
-        await instance.get(`/allUsers?page=${currentPage}&name=${searchName}`)
+        await instance.get(`${route}?page=${currentPage}&name=${searchName}`)
         .then(response => {
-            setUsers(response.data.data);
-            console.log(response)
+            setData(response.data.data);
+            console.log('table',response)
             setLoading(0)
         })
         .catch(error => console.error(error));
@@ -26,20 +22,8 @@ const PremiumDash = () => {
 
     useEffect(() => {
         query(currentPage, searchName)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentPage, loading]);
-    console.log(users)
-
-    const updatePremiumStatus = async (id, premium) => {
-        setLoading(id)
-        
-        const formDataUser = new FormData();
-        formDataUser.append('premium', premium);
-        try {
-            await instance.postForm(`/users/${id}?_method=PUT`, formDataUser).then(resp => console.log(resp))
-        } catch (error) {
-            console.error(error)
-        }
-    }
 
     return (
         <div className='p-10'>
@@ -59,30 +43,35 @@ const PremiumDash = () => {
                 <thead>
                     <tr>
                         <th></th>
-                        <th>Usuario</th>
-                        <th>Status</th>
+                        {cols.map((item, index) => (
+                            <th key={index}>{item}</th>
+                        ))}
                     </tr>
                 </thead>
                 <tbody>
-                    {users?.map(user => (
-                        <tr key={user.id}>
-                            <th>{user.id}</th>
-                            <td>{user.name}</td>
-                            <td>
-                                <button className={`btn bg-transparent border-none ${user.premium == 1 ? 'text-primary' : null}`} onClick={() => updatePremiumStatus(user.id, user.premium == 1 ? 0 : 1)}>
-                                    {user.premium == 1 ? 'Valido' : 'Invalido'}
-                                    {loading == user.id ? (
-                                        <span className="loading loading-spinner"></span>
-                                    ) : null}
-                                </button>
-                            </td>
+                    {data?.map((item, index )=> (
+                        <tr key={index}>
+                            <th>{item.id}</th>
+                            {fields?.map((ind, i) => (
+                                <td key={i}>
+                                    {ind.component ? (
+                                        <div>{<ind.component item={item}/>}</div>
+                                    ) : 
+                                        typeof ind.indexes == 'object' ? (
+                                            <div>{item[ind.indexes[0]][ind.indexes[1]]}</div>
+                                        ) : (
+                                            <div>{item[ind.indexes]}</div>
+                                        )
+                                    }
+                                </td>
+                            ))}
                         </tr>
                     ))}
                 </tbody>
             </table>
             </div>
 
-            {!users ? (
+            {!data ? (
                 <div className='flex justify-center my-20'>
                     <div className="loading loading-spinner loading-lg text-primary mx-auto"></div>
                 </div>
@@ -90,10 +79,10 @@ const PremiumDash = () => {
 
             <div className="join grid grid-cols-2 my-10 w-64 mx-auto">
                 <button className="join-item btn btn-outline" onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>Previous page</button>
-                <button className="join-item btn btn-outline" onClick={() => setCurrentPage(currentPage + 1)} disabled={users?.length < 50}>Next</button>
+                <button className="join-item btn btn-outline" onClick={() => setCurrentPage(currentPage + 1)} disabled={data?.length < 50}>Next</button>
             </div>
         </div>
     );
-};
+}
 
-export default PremiumDash;
+export default TableComponent
